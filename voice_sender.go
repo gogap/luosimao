@@ -52,7 +52,7 @@ func (p *VoiceSender) Send(req VoiceRequest, timeout int64) (response Response, 
 	params.Add("code", strCode)
 
 	_, body, errs := request.Post(p.sendUrl).Set("Authorization", p.auth.BasicAuthorization()).Set("Content-Type", "application/x-www-form-urlencoded").Send(params.Encode()).End()
-	fmt.Println(errs)
+
 	if errs != nil && len(errs) > 0 {
 		err = errs[0]
 	}
