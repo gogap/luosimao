@@ -29,11 +29,6 @@ func NewVoiceSender(auth Authorization, proto ProtocalType) *VoiceSender {
 			sender.sendUrl = VoiceServerURL + "verify.xml"
 			sender.statusUrl = VoiceServerURL + "status.xml"
 		}
-	case JSONP:
-		{
-			sender.sendUrl = VoiceServerURL + "verify.jsonp"
-			sender.statusUrl = VoiceServerURL + "status.jsonp"
-		}
 	}
 	sender.auth = auth
 
@@ -53,8 +48,8 @@ func (p *VoiceSender) Send(req VoiceRequest, timeout int64) (response Response, 
 
 	_, body, errs := request.Post(p.sendUrl).Set("Authorization", p.auth.BasicAuthorization()).Set("Content-Type", "application/x-www-form-urlencoded").Send(params.Encode()).End()
 
-	if errs != nil && len(errs) > 0 {
-		err = errs[0]
+	if err = errors_to_error(errs); err != nil {
+		return
 	}
 
 	if e := json.Unmarshal([]byte(body), &response); e != nil {
@@ -72,8 +67,8 @@ func (p *VoiceSender) Status(timeout int64) (status Status, err error) {
 
 	_, body, errs := request.Post(p.statusUrl).Set("Authorization", p.auth.BasicAuthorization()).Set("Content-Type", "application/x-www-form-urlencoded").End()
 
-	if errs != nil && len(errs) > 0 {
-		err = errs[0]
+	if err = errors_to_error(errs); err != nil {
+		return
 	}
 
 	if e := json.Unmarshal([]byte(body), &status); e != nil {
