@@ -6,7 +6,7 @@ luosimao
 #### 通过`go get`获取类库
 
 ```bash
-go get github.com/igonow/luosimao
+go get github.com/gogap/luosimao
 ```
 
 #### 示例代码
@@ -20,7 +20,7 @@ import (
     "encoding/json"
     "fmt"
 
-    "github.com/igonow/luosimao"
+    "github.com/gogap/luosimao"
 )
 
 var voiceAuth luosimao.Authorization

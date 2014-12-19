@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/igonow/luosimao"
+	"github.com/gogap/luosimao"
 )
 
 var voiceAuth luosimao.Authorization
