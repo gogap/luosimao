@@ -9,10 +9,11 @@ import (
 )
 
 type SMSSender struct {
-	sendUrl   string
-	statusUrl string
-	auth      Authorization
-	Proxy     string
+	sendUrl      string
+	sendBatchUrl string
+	statusUrl    string
+	auth         Authorization
+	Proxy        string
 }
 
 func NewSMSSender(auth Authorization, proto ProtocalType) *SMSSender {
@@ -21,11 +22,13 @@ func NewSMSSender(auth Authorization, proto ProtocalType) *SMSSender {
 	case JSON:
 		{
 			sender.sendUrl = SMSServerURL + "send.json"
+			sender.sendBatchUrl = SMSServerURL + "send_batch.json"
 			sender.statusUrl = SMSServerURL + "status.json"
 		}
 	case XML:
 		{
 			sender.sendUrl = SMSServerURL + "send.xml"
+			sender.sendBatchUrl = SMSServerURL + "send_batch.xml"
 			sender.statusUrl = SMSServerURL + "status.xml"
 		}
 	}
@@ -44,6 +47,34 @@ func (p *SMSSender) Send(req SMSRequest, timeout int64) (response Response, err 
 	params.Add("message", req.Message)
 
 	_, body, errs := request.Post(p.sendUrl).Set("Authorization", p.auth.BasicAuthorization()).Set("Content-Type", "application/x-www-form-urlencoded").Send(params.Encode()).End()
+
+	if err = errors_to_error(errs); err != nil {
+		return
+	}
+
+	if e := json.Unmarshal([]byte(body), &response); e != nil {
+		err = e
+		return
+	}
+
+	return
+}
+
+func (p *SMSSender) BatchSend(req BatchSMSRequest, timeout int64) (response Response, err error) {
+	if req.Mobiles == "" {
+		return
+	}
+
+	to := time.Duration(timeout)
+
+	request := gorequest.New().Timeout(to * time.Millisecond).Proxy(p.Proxy)
+
+	params := url.Values{}
+	params.Add("mobile_list", req.Mobiles)
+	params.Add("message", req.Message)
+	params.Add("time", req.Time)
+
+	_, body, errs := request.Post(p.sendBatchUrl).Set("Authorization", p.auth.BasicAuthorization()).Set("Content-Type", "application/x-www-form-urlencoded").Send(params.Encode()).End()
 
 	if err = errors_to_error(errs); err != nil {
 		return
