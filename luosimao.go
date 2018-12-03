@@ -14,7 +14,7 @@ const (
 
 const (
 	SMSServerURL   = "https://sms-api.luosimao.com/v1/"
-	VoiceServerURL = "http://voice-api.luosimao.com/v1/"
+	VoiceServerURL = "https://voice-api.luosimao.com/v1/"
 )
 
 func errors_to_error(errs []error) error {
